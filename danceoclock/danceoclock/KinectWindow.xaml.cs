@@ -52,6 +52,16 @@ namespace danceoclock
             if ((WMPPlayState)currentState == WMPPlayState.wmppsStopped)
             {
                 phase++;
+                Console.WriteLine(phase);
+            }
+        }
+
+        // specifically for player1: move on to next phase
+        private void Playerfinal_PlayStateChange(int currentState)
+        {
+            if ((WMPPlayState)currentState == WMPPlayState.wmppsStopped)
+            {
+                Close();
             }
         }
 
@@ -123,56 +133,121 @@ namespace danceoclock
                             List<double> Current = NextFrame(body);
 
                             //TODO: case switch for different sections that use players differently
-
-                            // trigger first backing track - forest - right arm above left
-                            
-                            if (Current[2] > Current[1] + .3 && Player1.playState != WMPPlayState.wmppsPlaying && Player1.playState != WMPPlayState.wmppsTransitioning)
+                            if (phase == 1)
                             {
-                                this.Dispatcher.Invoke(() =>
+                                // trigger first backing track - forest - right arm above left
+
+                                if (Current[2] > Current[1] + .3 && Player1.playState != WMPPlayState.wmppsPlaying && Player1.playState != WMPPlayState.wmppsTransitioning)
                                 {
-                                    Player1.PlayStateChange += new WMPLib._WMPOCXEvents_PlayStateChangeEventHandler(Player1_PlayStateChange);
-                                    Player1.URL = "C://Users//shanali//Desktop//techtracks//explorality_back_1.mp3";
-                                    Player1.controls.play();
-                                    //System.Threading.Thread.Sleep(45000);
-                                    phase++;
-                                });
+                                    this.Dispatcher.Invoke(() =>
+                                    {
+                                        Player1.PlayStateChange += new WMPLib._WMPOCXEvents_PlayStateChangeEventHandler(Player1_PlayStateChange);
+                                        Player1.URL = "C://Users//shanali//Desktop//Tech101-Final-Project//techtracks//explorality_back_1.mp3";
+                                        Player1.controls.play();
+                                    });
+                                }
+
+                                // trigger leaves sounds - right hand above head
+                                if (Current[2] > Current[0] && Player2.playState != WMPPlayState.wmppsPlaying && Player2.playState != WMPPlayState.wmppsTransitioning)
+                                {
+                                    if (play2mode == "leaves1")
+                                    {
+                                        this.Dispatcher.Invoke(() =>
+                                        {
+                                            Player2.PlayStateChange += new WMPLib._WMPOCXEvents_PlayStateChangeEventHandler(Player_PlayStateChange);
+                                            Player2.URL = "C://Users//shanali//Desktop//Tech101-Final-Project//techtracks//leaves1.mp3";
+                                            Player2.controls.play();
+                                            System.Threading.Thread.Sleep(2000);
+                                            play2mode = "leaves2";
+                                        });
+
+                                    }
+                                    else if (play2mode == "leaves2")
+                                    {
+                                        this.Dispatcher.Invoke(() =>
+                                        {
+                                            Player2.PlayStateChange += new WMPLib._WMPOCXEvents_PlayStateChangeEventHandler(Player_PlayStateChange);
+                                            Player2.URL = "C://Users//shanali//Desktop//Tech101-Final-Project//techtracks//leaves2.mp3";
+                                            Player2.controls.play();
+                                        });
+                                    }
+                                }
+
+
+                                // trigger footstep sounds - right foot above left
+                                if (Current[4] > Current[3] + .1 && Player3.playState != WMPPlayState.wmppsPlaying)
+                                {
+                                    this.Dispatcher.Invoke(() =>
+                                    {
+                                        Player3.PlayStateChange += new WMPLib._WMPOCXEvents_PlayStateChangeEventHandler(Player_PlayStateChange);
+                                        Player3.URL = "C://Users//shanali//Desktop//Tech101-Final-Project//techtracks//footstep.mp3";
+                                        Player3.controls.play();
+                                    });
+                                }
+
                             }
 
-                            // trigger leaves sounds - right hand above head
-                            if (Current[2] > Current[0] && Player2.playState != WMPPlayState.wmppsPlaying && Player1.playState != WMPPlayState.wmppsTransitioning)
+                            else if (phase == 2)
                             {
-                                if (play2mode == "leaves1")
+                                // second backing track: cave - head below left elbow
+                                if (Current[0] < Current[5] && Player1.playState != WMPPlayState.wmppsPlaying && Player1.playState != WMPPlayState.wmppsTransitioning)
                                 {
                                     this.Dispatcher.Invoke(() =>
                                     {
-                                        Player2.PlayStateChange += new WMPLib._WMPOCXEvents_PlayStateChangeEventHandler(Player_PlayStateChange);
-                                        Player2.URL = "C://Users//shanali//Desktop//techtracks//leaves1.mp3";
-                                        Player2.controls.play();
-                                        System.Threading.Thread.Sleep(2000);
-                                        play2mode = "leaves2";
+                                        Player1.PlayStateChange += new WMPLib._WMPOCXEvents_PlayStateChangeEventHandler(Player1_PlayStateChange);
+                                        Player1.URL = "C://Users//shanali//Desktop//Tech101-Final-Project//techtracks//explorality_back_2.mp3";
+                                        Player1.controls.play();
                                     });
+                                }
 
-                                } else if (play2mode == "leaves2")
+                                // bats - right hand above head
+                                if (play2mode != "nobats" && Current[2] > Current[0] && Player2.playState != WMPPlayState.wmppsPlaying && Player2.playState != WMPPlayState.wmppsTransitioning)
                                 {
                                     this.Dispatcher.Invoke(() =>
                                     {
                                         Player2.PlayStateChange += new WMPLib._WMPOCXEvents_PlayStateChangeEventHandler(Player_PlayStateChange);
-                                        Player2.URL = "C://Users//shanali//Desktop//techtracks//leaves2.mp3";
+                                        Player2.URL = "C://Users//shanali//Desktop//Tech101-Final-Project//techtracks//bats.mp3";
+                                        Player2.controls.play();
+                                        play2mode = "nobats";
+                                    });
+                                }
+
+                                // elevator - both hands over head
+                                if (Current[0] < Current[1] && Current[0] < Current[2] && Player2.playState != WMPPlayState.wmppsPlaying && Player2.playState != WMPPlayState.wmppsTransitioning)
+                                {
+                                    this.Dispatcher.Invoke(() =>
+                                    {
+                                        Player2.PlayStateChange += new WMPLib._WMPOCXEvents_PlayStateChangeEventHandler(Player_PlayStateChange);
+                                        Player2.URL = "C://Users//shanali//Desktop//Tech101-Final-Project//techtracks//elevator.mp3";
                                         Player2.controls.play();
                                     });
                                 }
                             }
 
-                            
-                            // trigger footstep sounds - right foot above left
-                            if ( Current[4] > Current[3] + .06 && Player3.playState != WMPPlayState.wmppsPlaying)
+                            else if (phase >= 3)
                             {
-                                this.Dispatcher.Invoke(() =>
+                                // third backing track: high notes - right hand above head
+                                if (Current[2] > Current[0] && Player1.playState != WMPPlayState.wmppsPlaying && Player1.playState != WMPPlayState.wmppsTransitioning)
                                 {
-                                    Player3.PlayStateChange += new WMPLib._WMPOCXEvents_PlayStateChangeEventHandler(Player_PlayStateChange);
-                                    Player3.URL = "C://Users//shanali//Desktop//techtracks//footstep.mp3";
-                                    Player3.controls.play();
-                                });
+                                    this.Dispatcher.Invoke(() =>
+                                    {
+                                        Player1.PlayStateChange += new WMPLib._WMPOCXEvents_PlayStateChangeEventHandler(Player_PlayStateChange);
+                                        Player1.URL = "C://Users//shanali//Desktop//Tech101-Final-Project//techtracks//explorality_back_3.mp3";
+                                        Player1.controls.play();
+                                    });
+                                    Console.WriteLine("played");
+                                }
+
+                                // beats: left foot above right foot 
+                                if (Current[3] > Current[4] + .1 && Player2.playState != WMPPlayState.wmppsPlaying)
+                                {
+                                    this.Dispatcher.Invoke(() =>
+                                    {
+                                        Player2.PlayStateChange += new WMPLib._WMPOCXEvents_PlayStateChangeEventHandler(Playerfinal_PlayStateChange);
+                                        Player2.URL = "C://Users//shanali//Desktop//Tech101-Final-Project//techtracks//beats.mp3";
+                                        Player2.controls.play();
+                                    });
+                                }
                             }
 
 
@@ -250,6 +325,9 @@ namespace danceoclock
 
             // right foot height 4
             CurrentData.Add(body.Joints[JointType.FootRight].Position.Y);
+
+            // left elbow height 5
+            CurrentData.Add(body.Joints[JointType.ElbowLeft].Position.Y);
 
             /*
             // shoulderleftangle
